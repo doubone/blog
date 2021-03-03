@@ -23,7 +23,19 @@ $ npm cache verify
 $ npm install
 ```
 代码执行完毕依赖包提示已经安装成功，并且没有报错，启动项目时，提示错误如下：  
-![安装依赖报错]( "安装报错")
+![安装依赖报错](https://github.com/doubone/javascript/blob/master/docs/images/%E4%BE%9D%E8%B5%96%E7%BC%BA%E5%A4%B1.png "安装报错") 
+
+错误信息提示是`node`中的流操作依赖包没安装上，按照错误提示，继续安装：  
+```shell
+$ npm install -g readable-stream/duplex.js 
+                 readable-stream/passthrough.js 
+                 readable-stream/writable.js 
+                 throttle-debounce/debounce 
+                 throttle-debounce/throrrle
+```  
+安装过程直接报错，报错信息如下图：  
+![安装缺失依赖报错](https://github.com/doubone/javascript/blob/master/docs/images/%E5%AE%89%E8%A3%85%E7%BC%BA%E5%A4%B1%E4%BE%9D%E8%B5%96%E6%8A%A5%E9%94%99.png "安装缺失依赖报错")
+
 ### NPM使用介绍  
 NPM是随同NodeJS一起安装的包管理工具，能解决NodeJS代码部署上的很多问题，常见的使用场景有以下几种：
 
