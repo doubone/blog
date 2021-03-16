@@ -7,6 +7,11 @@
               # github related website
               13.229.188.59 github.com
               185.60.216.36 github.global.ssl.fastly.net
+              或者
+              # github related website
+              13.229.188.59 github.com
+              140.82.114.4	github.com
+              199.232.5.194	github.global.ssl.fastly.net
            清除DNS缓  sudo dscacheutil -flushcache
 -  window操作系统：
         本地hosts文件路径：C:\Windows\System32\drivers\etc\hosts
