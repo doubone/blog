@@ -1,3 +1,43 @@
+# XSS漏洞
+## 反射型
+>url参数直接注入
+```js
+http://localhost/?from=<script>alert(111)</script>
+```
+## 存储型
+>存储到DB后读取时注入
+```js
+// 留言板
+留言测试<script>alert(222)</script>//留言内容
+```
+
+* HTML节点内容
+```html
+<div>
+    #{content}
+</div>
+
+<div>
+    <script>
+    </script>
+</div>
+```
+* HTML属性
+```html
+<img src="#{image}"/>
+<img src=" 1"onerror="alert(1)" />
+```
+* JavaScript代码
+```js
+<script>
+    var data = "#{data}";
+    var data = "hello":alert(1)
+</script>
+```
+* 富文本
+富文本需要保留HTML
+HTML有XSS攻击风险
+
 
 2. 搜索框中的脚本参数
     {
