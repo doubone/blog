@@ -44,7 +44,7 @@ HTML有XSS攻击风险
 
 
 # 处理方法
-***
+
 整体思路：**转义**  
 * HTML->[HTML实体](https://www.w3school.com.cn/html/html_entities.asp)  
 * js->JSON_encode
@@ -249,7 +249,7 @@ $.html();
 那有没有现有的可直接使用的第三方框架吗？答案是肯定的
 
 # js-XSS
-*****
+
 `xss`是一个用于对用户输入的内容进行过滤，以避免遭受 XSS 攻击的模块。主要用于论坛、博客、网上商店等等一些可允许用户录入页面排版、格式控制相关的 HTML 的场景，xss模块通过白名单来控制允许的标签及相关的标签属性，另外还提供了一系列的接口以便用户扩展，比其他同类模块更为灵活[中文官网地址](https://github.com/leizongmin/js-xss/blob/master/README.zh.md)  
 示例代码：  
 ```js
@@ -266,7 +266,7 @@ var xssFilter = function (html) {
 * 白名单控制允许的 HTML 标签及各标签的属性
 * 通过自定义处理函数，可对任意标签及其属性进行处理  
 ## 使用方法：  
-***
+
 在`Node.js`中使用  
 ```js
 var xss = require("xss");
@@ -293,7 +293,7 @@ alert(html);
 * 用于指定那些内容可执行
 ## 使用方法： 
 配置内容安全策略涉及到添加 Content-Security-Policy  HTTP头部到一个页面，并配置相应的值，以控制用户代理（浏览器等）可以为该页面获取哪些资源。
-***
+
 ## 常见用例：
 ### 示例1 
 一个网站管理者想要所有内容均来自站点的同一个源 (不包括其子域名)  
@@ -307,7 +307,6 @@ Content-Security-Policy: default-src 'self'
  ```
  更多示例及用法请参考[MDN-CSP](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CSP)  
  # 结语  
- ***
  安全作为系统的壁垒，重要程度不用多说。
  XSS攻击更是安全防御的重中之中。  
  本文记录的是笔者在开发过程中遇到的问题及处理的思路。可供有类似问题的读者参考。   
@@ -326,23 +325,5 @@ Content-Security-Policy: default-src 'self'
 
 
 
-2. 搜索框中的脚本参数
-    {
-        condition:{
-            params:'keyWord'
-        }
-    }
-    类似此种传参方式不会引入xss攻击
-3.富文本编辑器中的输入框
-    在富文本编辑器中输入的执行脚本
-    发送参数时参数会转码，
-    <img style="height: 10em;" src="https://dpsvdv74uwwos.cloudfront.net/statics/img/ogimage/cross-site-scripting-xss.jpg" /">
-    <p>&lt;img style="height:10em" src="https://dpsvdv74uwwos.cloudfront.net/statics/img/ogimage/cross-site-scripting-xss.jpg" &gt;</p>
-    后端返回如上的数据，浏览器会识别 &lt; 成<,也就是说在浏览器的页面上看到的是
 
-    <img style="height: 10em;" src="https://dpsvdv74uwwos.cloudfront.net/statics/img/ogimage/cross-site-scripting-xss.jpg" /">
-
-    这样的字符串，不是存在于`element`元素中的HTML标签
-上述两种情况不会发生XSS攻击
-4.通过restAPi方式去注入攻击脚本
 
