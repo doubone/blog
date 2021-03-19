@@ -38,9 +38,8 @@ http://localhost/?keyWord=<script>alert(111)</script>
 </script>
 ```
 * 富文本  
-
 富文本需要保留HTML  
-HTML有XSS攻击风险
+HTML存在XSS攻击风险
 
 
 # 处理方法
@@ -56,7 +55,7 @@ HTML有XSS攻击风险
 转义方式更倾向于**第一种**：因为输入是一次性性能消费，而输出会是多次，造成性能浪费，本文的示例代码内容由于个人编译、演示方便原因是采用第二种方式-返回时转义，请各位读者知晓
 
 ## HTML节点内容  
-处理思路：转义`<``>`,使之不能以`html`标签的形式保存或者返回给前端
+处理思路：转义`< >`,使之不能以`html`标签的形式保存或者返回给前端
 ```js
 //转义函数
 var escapeHtml = function(str){
@@ -77,7 +76,7 @@ var escapeHtml = function(str){
 ```
 
 ## HTML属性  
-处理思路：转义`"`引号，使标签内属性不能各自闭合，引发触发事件  
+处理思路：转义`"`引号，使标签内属性不能自闭合，引起触发事件  
 ```js
 // 转义函数
 var escapeHtmlProperty = function(str){
@@ -96,10 +95,11 @@ var escapeHtmlProperty = function(str){
 // 页面dom呈现
 <img src="1&quto; onerror=&quto;alert(1)" />
 ```
-问题来了，转义了`HTML`属性中的`<``>`号，会对元素产生影响吗？转义了`HTML`节点内容中的`"``'`` `，会对元素产生影响吗？  
+那么问题来了，转义了`HTML`属性中的大于号、小于号，会对元素产生其他影响吗？转义了`HTML`节点内容中的单引号、双引号、空格，会对元素产生其他影响吗？  
 答案是不会产生影响的，读者可以自行验证。  
 此时可以合并上面的两个函数，整体处理`HTML`节点和属性,合并函数如下：  
 ```js
+// 转义函数
 var escapeHtml = function(str){
     str = str.replace(/&/g,'&amp;');//&符号也需要转义，但是一定放在第一个转
     str = str.replace(/</g,'&lt;');
@@ -113,7 +113,7 @@ var escapeHtml = function(str){
 
 ```
 ## JavaScript代码
-处理思路：转义`"`-双引号或者JSON_encode
+处理思路：转义双引号或者JSON_encode
 ```js
 //转义函数
 var escapeForJs =function(str){
@@ -129,45 +129,48 @@ var str = "!{keyWord}";
 console.log(str)
 </script>
 
-//输入keyWord值：google";alert(1);"
+//hello world";alert(1);"
 //转义前
 <script>
-google
+hello world
 alert(1)已经被弹出
 </script>
 
 //转义后
-google";alert(1);"
+hello world";alert(1);"
 ```
-然后这样就安全了吗？  
+然而这样就安全了吗？  
 答案肯定不是！  
-单引号、script标签、双引号、空格...都可以引发攻击，更为安全的方式-**JSON转义** 
+单引号、script标签、双引号、空格...都可以引发攻击，更为安全的方式-**JSON_encode转义** 
 ## JavaScript代码_JSON_encode转义
 JSON_encode转义-**JSON.stringify**  
-演示代码：  
+演示代码：
+```js
+// 转义函数
+JSON.stringify(参数)
+```  
 ```js
 //转义前
-google";alert(1);"
+hello world";alert(1);"
 //转义后
-google";alert(1);"
+hello world";alert(1);"
 ```
 
 ## 富文本  
 处理思路：**过滤** 
 1. 黑名单过滤
->比如 `script`标签、`onerror`标签全部过滤掉  
+>比如 `script`标签、`onerror`标签...全部过滤掉  
 * 利：实现简单-正则表达式就可处理
 * 弊：HTML标签过于庞杂，难免会留有漏洞
 2. 白名单过滤  
->按照白名单保留部分标签和属性  
-只允许某些标签带有那些属性
+>按照白名单过滤保留部分标签和属性,只允许保留名单内的标签、属性
 * 利：比较彻底，只允许指定的标签、属性存在  
 * 弊：实现起来相对麻烦，将HTML完全解析成数据结构，再对数据结构过滤，再组装成HTML  
 
 ### 黑名单过滤：  
 示例攻击代码：  
 ```html
-//可能输入的攻击脚本
+<!-- 可能输入的攻击脚本 -->
 <font color=\"red\">这是红色字</font><script>alert('富文本')</script>
 <a href=\"javascript:alert(1)\"></a>
 <img src=\"abc\" onerror=\"alert(1)\">
@@ -187,7 +190,7 @@ var xssFilter = function (html) {
 	return html
 }
 ```
-HTML中带有实践出发的都有可能成为攻击的突破口，面对这种情况，怎么防御呢？下面介绍白名单过滤。  
+HTML中带有事件触发的都有可能成为攻击的突破口，面对这种情况，怎么防御呢？下面介绍白名单过滤。  
 ### 白名单过滤：  
 处理思路：整理富文本中所有的标签属性，过滤只允许这些属性通过，其他属性则不允许通过  
 处理方式：将HTML解析成树状结构，和浏览器解析HTML过程类似，再去遍历树状结构元素，在过滤范围内的允许通过，没在过滤范围内的，则去掉   
@@ -207,7 +210,7 @@ HTML中带有实践出发的都有可能成为攻击的突破口，面对这种�
 //过滤代码
 var xssFilter = function (html) {
 	if (!html) return '';
-	//白名单
+	//白名单 
 	var whiteList = {
 		'img': ['src'],
 		'font':['color','size'],
@@ -231,7 +234,7 @@ var xssFilter = function (html) {
 ```
 # cheerio介绍  
 
-> cheerio是为服务器特别定制的，快速、灵活、实施的jQuery核心实现的对DOM操作方案的实现
+> cheerio是为服务器特别定制的，快速、灵活、实施的以jQuery为核心实现的对DOM操作方案
 ```js
 //基础用法
 const cheerio = require('cheerio');
