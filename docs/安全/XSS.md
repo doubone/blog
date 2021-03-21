@@ -1,45 +1,61 @@
 # XSS攻击
+## XSS[介绍](https://baike.baidu.com/item/XSS%E6%94%BB%E5%87%BB/954065?fr=aladdin)
+>XSS攻击通常指的是通过利用网页开发时留下的漏洞，通过巧妙的方法注入恶意指令代码到网页，使用户加载并执行攻击者恶意制造的网页程序。这些恶意网页程序通常是JavaScript，但实际上也可以包括Java、 VBScript、ActiveX、 Flash 或者甚至是普通的HTML。攻击成功后，攻击者可能得到包括但不限于更高的权限（如执行一些操作）、私密网页内容、会话和cookie等各种内容。(内容摘自百度百科)
+
+xss攻击类型可分为两种，**反射型**和**存储型**，顾名思义一种是保存进了数据库，另一种是在url中直接触发，没保存进数据库，下面一一介绍。
 ## 反射型
 >url参数直接注入
+
+场景说明：在网站的搜索框内直接输入攻击脚本
 ```js
-// 示例代码
+// 搜索框搜索
 http://localhost/?keyWord=<script>alert(111)</script>
 ```
 ## 存储型
 >存储到DB后读取时注入
+场景说明：攻击脚本作为留言内容，提交给后台保存，刷新页面后端返回攻击脚本给前端
 ```js
-// 示例代码
+// 留言板插入数据库
 留言测试<script>alert(222)</script>//留言内容
 ```
 
 * HTML节点内容
-```html
-<div>
-    #{content}
-</div>
 
+攻击脚本通过接口存入数据库中，当页面刷新时，插入的脚本替换页面HTML节点内容，脚本随即执行，引发漏洞攻击
+```html
+<!-- content变量被攻击脚本替换 -->
+<div>
+    {{content}}
+</div>
 <div>
     <script>
     </script>
 </div>
+
 ```
 
 
-* HTML属性
+* HTML属性 
+
+通过修改或者添加HTML属性，触发攻击事件
 ```html
+<!-- 图片地址异常后，引发错误事件 -->
 <img src="#{image}"/>
 <img src=" 1"onerror="alert(1)" />
 ```
-* JavaScript代码
+* JavaScript代码  
+通过获取用户输入的变量或者其他保存的变量，在脚本中打印
 ```js
 <script>
-    var data = "#{data}";
-    var data = "hello":alert(1)
+    var data = params;
+    console.log(data)
+    // 输入内容
+    params = "hello":alert(1)
 </script>
 ```
 * 富文本  
-富文本需要保留HTML  
-HTML存在XSS攻击风险
+富文本需要保留HTML   
+HTML有XSS攻击风险
 
 
 # 处理方法
@@ -48,7 +64,7 @@ HTML存在XSS攻击风险
 * HTML->[HTML实体](https://www.w3school.com.cn/html/html_entities.asp)  
 * js->JSON_encode
 
-转义方式：  
+转义时机：  
 1. 存入数据库时转义
 2. 返回给前端时转义
 
