@@ -20,6 +20,28 @@
 * 冒充用户发帖背锅
 * 损坏网站名誉
 
-## 防御
-* 禁止第三方网站带Cookies
-* sameSite
+# CSRF 攻击防御
+## 禁止第三方网站带Cookies
+## sameSite
+`samesite`是HTTP响应头`Set-Cookie`的属性之一。它允许您声明该Cookie是否仅限于第一方或者同一站点的访问。`SameSite`接受下面三个值:  
+* Lax   
+Cookies允许与当前网页的URL与请求目标一致时发送，并且与第三方网站发起的GET请求也会发送。浏览器默认值。
+ 
+* Strict  
+Cookies只会在当前网页的URL与请求目标一致时发送，不会与第三方网站发起的请求一起发送。
+```shell
+Set-Cookie:userId=123;SameSite=Strict
+```
+* None  
+Cookie将在所有上下文中发送，即允许跨域发送。  
+使用`None`时，必须同时设置`Secure`属性（Cookie只能通过HTTPS协议发送），否则无效。  
+
+以下的设置无效：
+```shell
+Set-Cookie: userId=123; SameSite=None
+```
+下面的设置有效：
+```shell
+Set-Cookie: userId=123; SameSite=None;Secure
+```
+
