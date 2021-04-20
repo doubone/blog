@@ -23,10 +23,13 @@
 # CSRF 攻击防御
 ## 禁止第三方网站带Cookies
 ### sameSite
-`samesite`是HTTP响应头`Set-Cookie`的属性之一。它允许您声明该Cookie是否仅限于第一方或者同一站点的访问。`SameSite`接受下面三个值:  
+`samesite`是HTTP响应头`Set-Cookie`的属性之一。它允许您声明该Cookie是否仅限于第一方或者同一站点的访问。  
+`SameSite`接受下面三个值:  
 * Lax   
 Cookies允许与当前网页的URL与请求目标一致时发送，并且与第三方网站发起的GET请求也会发送。浏览器默认值。
- 
+ ```shell
+ Set-Cookie: userId=123; SameSite=Lax;
+```
 * Strict  
 Cookies只会在当前网页的URL与请求目标一致时发送，不会与第三方网站发起的请求一起发送。
 ```shell
@@ -49,11 +52,13 @@ sameSite难道可以解决所有的CSRF攻击吗？
 答案：当然不是，sameSite受浏览器兼容性的影响，并不能解决防御所有攻击。兼容性列表在MDN的链接中。  
 再按照攻击原理所理解，CSRF的攻击是不经过目标网站的前端的，那么我们是不是可以在此处“动手脚”尼？ 
 ## 在前端页面加入验证信息  
-* 验证码
+### 验证码
+***  
+
 处理思路：后端生成验证码保存并传递给前端；在前端提交表单数据中加入验证码并提交，在后端校验验证码存在和正确与否；
   
 ```js
-//captcha.js
+//验证码生成
 var captcha = {};
 var cache = {};
 captcha.captcha = async function (ctx, next) {
@@ -71,8 +76,8 @@ captcha.validCache = function (uid, data) {
 }
 module.exports = captcha;
 ```
-验证码校验：
 ```js
+//验证码校验
 ...
 const data = ctx.request.body;
 if(!data.captcha){
@@ -86,7 +91,8 @@ if(!resultCaptche){
 ...
 ```
 加入图形验证码对防御攻击可以起到很好的作用，但是每个表单都需要输入图形验证码且还要保证每次输入的验证码都正确。这对于用户来说是非常痛苦的一件事，由此可见这种方式在实际的使用中并不受用，那么有没有其他的更好的方案尼？
-## token验证  
+### token验证  
+***
 token其实是一段随机的字符串，它的作用是让攻击者发起请求时没有办法获取这个字符串，也就是必须要经过我们的页面，经过目标网站的前端。
 * 在 HTTP 请求中以參数的形式添加一个随机产生的 token，并在服务器端验证这个 token，假设请求中没有token 或者 token 内容不对，拒绝该请求。
 * 在HTTP请求头中，通过axios的配置参数，给所有的fetch请求全部加上Token这个HTTP请求头属性，并把Token值也放入请求头中。  
