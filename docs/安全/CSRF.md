@@ -141,7 +141,7 @@ if(!/^https?:\/\/localhost/.test(referer)){
 	throw new Error('非法请求')
 }
 ```
-当然这么还要考虑没有referer的情况
+当然这里还要考虑没有referer的情况哈
 
 # 结语  
  安全作为系统的壁垒，重要程度不用多说。  
